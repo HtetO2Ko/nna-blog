@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "35899939423",
+    "project_id": "nna-blog-c716e",
+    "storage_bucket": "nna-blog-c716e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:35899939423:android:acda8b1e8f2d96f2aa99ea",
+        "android_client_info": {
+          "package_name": "com.example.blog"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "35899939423-2hjo5qah5q3se68sh8m2oemuqfl9rh8k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvtjz6sP0l33tyoN5d_cOjU3ZYl0sAIvs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "35899939423-2hjo5qah5q3se68sh8m2oemuqfl9rh8k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
