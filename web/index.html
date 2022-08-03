@@ -32,6 +32,7 @@
 
   <title>blog</title>
   <link rel="manifest" href="manifest.json">
+  <base href="/">
 </head>
 
 <body>
@@ -115,6 +116,9 @@
       // Service workers not supported. Just drop the <script> tag.
       loadMainDartJs();
     }
+  </script>
+  <script type = "text/javascript">
+    window.flutterWebRenderer = 'html';
   </script>
 </body>
 

@@ -2,6 +2,7 @@ import 'package:blog/common.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -32,9 +33,9 @@ class _LoginPageState extends State<LoginPage> {
                 Padding(
                   padding: const EdgeInsets.only(top: 20),
                   child: Image.asset(
-                    "images/logo.jpg",
-                    width: 150,
-                    height: 150,
+                    "images/logo.png",
+                    width: 200,
+                    height: 200,
                   ),
                 ),
                 Padding(
@@ -101,8 +102,8 @@ class _LoginPageState extends State<LoginPage> {
                                 //     ? Icons.visibility
                                 //     : Icons.visibility_off,
                                 checkObscureText
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
                                 color: Colors.black45,
                               ),
                             ),
@@ -125,11 +126,13 @@ class _LoginPageState extends State<LoginPage> {
               ],
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.only(top: 25),
               child: GestureDetector(
-                onTap: () {
+                onTap: () async {
                   List myList = [];
                   loading = true;
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.setString("username", _usernameController.text);
                   _fireStore.collection('login').get().then((snapshot) {
                     for (var docs in snapshot.docs) {
                       if (docs.get("username") != _usernameController.text ||

@@ -1,9 +1,11 @@
 import 'package:blog/Pages/add_and_edit_items.dart';
+import 'package:blog/Pages/details_page.dart';
 import 'package:blog/Pages/show_items.dart';
 import 'package:blog/Pages/home_page.dart';
 import 'package:blog/Pages/login_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:url_strategy/url_strategy.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +18,7 @@ void main() async {
       storageBucket: "gs://nna-blog.appspot.com",
     ),
   );
+  setPathUrlStrategy();
   runApp(const MyApp());
 }
 
@@ -35,7 +38,6 @@ class MyApp extends StatelessWidget {
         '/admin': (context) => const LoginPage(),
         '/admin/show-items': (context) => const ShowContentPage(),
         '/admin/add-items': (context) => AddAndEditItemsPage(id: 1),
-        '/admin/edit-items': (context) => AddAndEditItemsPage(id: 2),
       },
       home: const HomePage(),
       // home: AddAndEditItemsPage(id: 1),

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+String ubuntuFont = "Ubuntu";
+var textColor = Colors.black;
+
 void showToast(BuildContext context, String massage) {
   final scaffold = ScaffoldMessenger.of(context);
   scaffold.showSnackBar(
@@ -9,10 +12,6 @@ void showToast(BuildContext context, String massage) {
     ),
   );
 }
-
-String ubuntuFont = "Ubuntu";
-
-var textColor = Colors.black;
 
 // firebase firestore rules
 // rules_version = '2';

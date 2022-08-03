@@ -1,5 +1,4 @@
-import 'dart:ui';
-
+import 'package:blog/Pages/details_page.dart';
 import 'package:blog/common.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -16,13 +15,11 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final _fireStore = FirebaseFirestore.instance;
 
-  var dropdownvalue = "Type";
-  var items = ["Type"];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
         child: Column(
           children: [
             Padding(
@@ -30,28 +27,15 @@ class _HomePageState extends State<HomePage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Image.asset(
-                        "images/logo.png",
-                        width: 75,
-                        height: 50,
-                      ),
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      Text(
-                        "Blog",
-                        style: TextStyle(
-                          // color: Color.fromARGB(255, 252, 62, 62),
-                          color: const Color.fromARGB(255, 241, 21, 21),
-                          fontFamily: ubuntuFont,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 45,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    "Mr. Hunger",
+                    style: TextStyle(
+                      // color: Color.fromARGB(255, 252, 62, 62),
+                      color: const Color(0xFFD61C4E),
+                      fontFamily: ubuntuFont,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 35,
+                    ),
                   ),
                   TextButton(
                     onPressed: () {
@@ -65,6 +49,9 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
+            ),
+            const SizedBox(
+              height: 50,
             ),
             StreamBuilder<QuerySnapshot>(
               stream: _fireStore.collection("blog").snapshots(),
@@ -89,125 +76,125 @@ class _HomePageState extends State<HomePage> {
                 var mySnap = snapshot.data!.docs;
                 return ListView.builder(
                   shrinkWrap: true,
+                  physics: const BouncingScrollPhysics(),
                   itemCount: mySnap.length,
+                  scrollDirection: Axis.vertical,
                   itemBuilder: (context, index) {
-                    return Padding(
-                      padding:
-                          const EdgeInsets.only(top: 23, left: 30, right: 30),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              print(index);
-                              setState(() {});
-                            },
-                            child: Text(
-                              mySnap[index]["title"],
-                              style: TextStyle(
-                                color: textColor,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: ubuntuFont,
-                                fontSize: 35,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Icon(
-                                Icons.calendar_month_outlined,
-                                size: 15,
-                                color: textColor,
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              Text(
-                                DateFormat("dd-MM-yyyy").format(
-                                    DateTime.parse(mySnap[index]["date"])),
-                                style: TextStyle(
-                                  color: textColor,
-                                  fontFamily: ubuntuFont,
-                                  fontSize: 15,
+                    return Center(
+                      child: Container(
+                        width: 900,
+                        margin: const EdgeInsets.all(10),
+                        child: GestureDetector(
+                          onTap: () {
+                            List myList = [];
+                            myList.add(mySnap[index].data());
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DetailsPage(
+                                  myList: myList,
                                 ),
                               ),
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 15,
-                          ),
-                          Text(
-                            mySnap[index]["desc"],
-                            style: TextStyle(
-                              color: textColor,
-                              fontFamily: ubuntuFont,
-                              fontSize: 15,
-                              height: 1.2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            maxLines: 5,
-                          ),
-                          const SizedBox(
-                            height: 15,
-                          ),
-                          ListView.builder(
-                            itemCount: mySnap[index]["blogList"].length,
-                            shrinkWrap: true,
-                            itemBuilder: (context, i) {
-                              var lis = mySnap[index]["blogList"];
-                              return Column(
+                            );
+                            // get id : mySnap[index].reference.id
+                            // update by id mySnap[index].reference.update
+                            setState(() {});
+                          },
+                          child: Card(
+                            elevation: 3,
+                            child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  lis[i]["type"] == "Image"
-                                      ? Image.network(
-                                          lis[i]["value"],
-                                          height: 100,
-                                          width: 100,
-                                        )
-                                      : Container(),
-                                  lis[i]["type"] == "Text"
-                                      ? Text(
-                                          lis[i]["value"],
+                                  Text(
+                                    mySnap[index]["title"],
+                                    style: TextStyle(
+                                      color: textColor,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: ubuntuFont,
+                                      fontSize: 35,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 10),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Icon(
+                                          Icons.calendar_month_outlined,
+                                          size: 15,
+                                          color: textColor,
+                                        ),
+                                        const SizedBox(
+                                          width: 5,
+                                        ),
+                                        Text(
+                                          DateFormat("dd-MM-yyyy").format(
+                                              DateTime.parse(
+                                                  mySnap[index]["date"])),
                                           style: TextStyle(
                                             color: textColor,
                                             fontFamily: ubuntuFont,
                                             fontSize: 15,
-                                            height: 1.2,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 15,
+                                  ),
+                                  Text(
+                                    mySnap[index]["desc"],
+                                    style: TextStyle(
+                                      color: textColor,
+                                      fontFamily: ubuntuFont,
+                                      fontSize: 15,
+                                      height: 1.8,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    maxLines: 5,
+                                  ),
+                                  const SizedBox(
+                                    height: 15,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Chip(
+                                        labelPadding: const EdgeInsets.all(2.0),
+                                        label: Text(
+                                          mySnap[index]["category"],
+                                          style: TextStyle(
+                                            color: textColor,
+                                            fontFamily: ubuntuFont,
+                                            fontSize: 10,
                                             overflow: TextOverflow.ellipsis,
                                           ),
-                                          maxLines: 1000,
-                                        )
-                                      : Container(),
+                                          maxLines: 1,
+                                        ),
+                                        backgroundColor: Colors.white,
+                                        elevation: 2.0,
+                                        shadowColor: Colors.grey[60],
+                                        padding: const EdgeInsets.all(8.0),
+                                      ),
+                                    ],
+                                  ),
                                 ],
-                              );
-                            },
-                          ),
-                          const SizedBox(
-                            height: 15,
-                          ),
-                          Chip(
-                            labelPadding: const EdgeInsets.all(2.0),
-                            label: Text(
-                              mySnap[index]["category"],
-                              style: const TextStyle(
-                                color: Colors.black,
                               ),
                             ),
-                            backgroundColor: Colors.white,
-                            elevation: 2.0,
-                            shadowColor: Colors.grey[60],
-                            padding: const EdgeInsets.all(8.0),
                           ),
-                        ],
+                        ),
                       ),
                     );
                   },
                 );
               },
+            ),
+            const SizedBox(
+              height: 30,
             ),
           ],
         ),
