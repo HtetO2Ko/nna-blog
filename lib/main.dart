@@ -1,5 +1,6 @@
-import 'package:blog/Pages/add_and_edit_items.dart';
+import 'package:blog/Pages/add_items_page.dart';
 import 'package:blog/Pages/details_page.dart';
+import 'package:blog/Pages/edit_items_page.dart';
 import 'package:blog/Pages/show_items.dart';
 import 'package:blog/Pages/home_page.dart';
 import 'package:blog/Pages/login_page.dart';
@@ -36,11 +37,12 @@ class MyApp extends StatelessWidget {
       routes: {
         '/home': (context) => const HomePage(),
         '/admin': (context) => const LoginPage(),
+        "/details": (context) => const DetailsPage(),
         '/admin/show-items': (context) => const ShowContentPage(),
-        '/admin/add-items': (context) => AddAndEditItemsPage(id: 1),
+        '/admin/add-items': (context) => const AddItemsPage(),
+        '/admin/edit-items': (context) => const EditItemsPage(),
       },
       home: const HomePage(),
-      // home: AddAndEditItemsPage(id: 1),
     );
   }
 }

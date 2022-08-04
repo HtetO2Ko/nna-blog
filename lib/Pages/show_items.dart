@@ -1,3 +1,4 @@
+import 'package:blog/Pages/add_items_page.dart';
 import 'package:blog/common.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,19 @@ class ShowContentPage extends StatefulWidget {
 
 class _ShowContentPageState extends State<ShowContentPage> {
   final _fireStore = FirebaseFirestore.instance;
+
+  _tableTitle(String title) {
+    return Center(
+      child: Text(
+        title,
+        style: const TextStyle(
+          color: Colors.black,
+          fontSize: 20,
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
 
   checkSharePreferenceData() async {
     final prefs = await SharedPreferences.getInstance();
@@ -36,6 +50,9 @@ class _ShowContentPageState extends State<ShowContentPage> {
       body: SafeArea(
         child: Column(
           children: [
+            const SizedBox(
+              height: 40,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -47,7 +64,7 @@ class _ShowContentPageState extends State<ShowContentPage> {
                   ),
                 ),
                 Container(
-                  width: 100,
+                  width: 120,
                   height: 50,
                   child: FlatButton(
                     onPressed: () {
@@ -62,7 +79,7 @@ class _ShowContentPageState extends State<ShowContentPage> {
                             color: Colors.black,
                           ),
                           Text(
-                            "Add item",
+                            "Add Item",
                           ),
                         ],
                       ),
@@ -92,105 +109,58 @@ class _ShowContentPageState extends State<ShowContentPage> {
                   );
                 }
                 var mySnap = snapshot.data!.docs;
-                return Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.black,
-                        width: 1,
-                      ),
-                    ),
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Padding(
+                    padding: const EdgeInsets.all(25),
                     child: DataTable(
                       border: TableBorder.all(
-                        width: 2,
-                        color: Colors.black,
+                        width: 0.2,
+                        color: Colors.grey,
                       ),
-                      columns: const [
+                      columns: [
                         DataColumn(
-                          label: Center(
-                            child: Text(
-                              'Title',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                                letterSpacing: 0.5,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
+                          label: _tableTitle("Title"),
                         ),
                         DataColumn(
-                          label: Center(
-                            child: Text(
-                              'Description',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                                letterSpacing: 0.5,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
+                          label: _tableTitle("Description"),
                         ),
                         DataColumn(
-                          label: Center(
-                            child: Text(
-                              'Date',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                                letterSpacing: 0.5,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
+                          label: _tableTitle("Date"),
                         ),
                         DataColumn(
-                          label: Center(
-                            child: Text(
-                              'Category',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                                letterSpacing: 0.5,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
+                          label: _tableTitle("Category"),
                         ),
                         DataColumn(
-                          label: Center(
-                            child: Text(
-                              'Action',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                                letterSpacing: 0.5,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
+                          label: _tableTitle("Action"),
                         ),
                       ],
                       rows: [
                         for (var i = 0; i < mySnap.length; i++)
                           DataRow(
+                            color: MaterialStateColor.resolveWith((states) {
+                              return i.isOdd
+                                  ? const Color.fromARGB(255, 207, 224, 255)
+                                  : Colors.white;
+                            }),
                             cells: <DataCell>[
                               DataCell(
                                 Container(
-                                  width: 125,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.08,
                                   child: Text(
                                     mySnap[i]["title"],
                                     maxLines: 1,
                                     style: const TextStyle(
-                                        overflow: TextOverflow.ellipsis),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
                                 ),
                               ),
                               DataCell(
                                 Container(
-                                  width: 125,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.08,
                                   child: Text(
                                     mySnap[i]["desc"],
                                     maxLines: 1,
@@ -201,7 +171,8 @@ class _ShowContentPageState extends State<ShowContentPage> {
                               ),
                               DataCell(
                                 Container(
-                                  width: 125,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.08,
                                   child: Text(
                                     mySnap[i]["date"],
                                     maxLines: 1,
@@ -210,7 +181,8 @@ class _ShowContentPageState extends State<ShowContentPage> {
                               ),
                               DataCell(
                                 Container(
-                                  width: 125,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.08,
                                   child: Text(
                                     mySnap[i]["category"],
                                     maxLines: 1,
@@ -231,6 +203,16 @@ class _ShowContentPageState extends State<ShowContentPage> {
                                         //   "desc": "Luffy",
                                         //   "blogList": [],
                                         // });
+                                        List myList = [];
+                                        myList.add(mySnap[i].data());
+                                        Navigator.pushNamed(
+                                          context,
+                                          "/admin/edit-items",
+                                          arguments: EditArguments(
+                                            mySnap[i].reference.id,
+                                            myList,
+                                          ),
+                                        );
                                         setState(() {});
                                       },
                                       icon: const Icon(
@@ -295,184 +277,6 @@ class _ShowContentPageState extends State<ShowContentPage> {
                           ),
                       ],
                     ),
-                    // child: ListView.builder(
-                    //   shrinkWrap: true,
-                    //   scrollDirection: Axis.vertical,
-                    //   itemCount: mySnap.length,
-                    //   itemBuilder: (context, index) {
-                    //     return Padding(
-                    //       padding: const EdgeInsets.only(
-                    //           top: 12, left: 30, right: 30, bottom: 12),
-                    //       child: Row(
-                    //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //         children: [
-                    //           Column(
-                    //             crossAxisAlignment: CrossAxisAlignment.start,
-                    //             children: [
-                    //               GestureDetector(
-                    //                 onTap: () {
-                    //                   print(index);
-                    //                   setState(() {});
-                    //                 },
-                    //                 child: Text(
-                    //                   mySnap[index]["title"],
-                    //                   style: TextStyle(
-                    //                     color: Colors.black,
-                    //                     fontWeight: FontWeight.bold,
-                    //                     fontFamily: ubuntuFont,
-                    //                     fontSize: 35,
-                    //                   ),
-                    //                 ),
-                    //               ),
-                    //               const SizedBox(
-                    //                 height: 5,
-                    //               ),
-                    //               Row(
-                    //                 mainAxisAlignment: MainAxisAlignment.start,
-                    //                 children: [
-                    //                   const Icon(
-                    //                     Icons.calendar_month_outlined,
-                    //                     size: 15,
-                    //                     color: Colors.black,
-                    //                   ),
-                    //                   const SizedBox(
-                    //                     width: 5,
-                    //                   ),
-                    //                   Text(
-                    //                     DateFormat("dd-MM-yyyy").format(
-                    //                         DateTime.parse(
-                    //                             mySnap[index]["date"])),
-                    //                     style: TextStyle(
-                    //                       color: Colors.black,
-                    //                       fontFamily: ubuntuFont,
-                    //                       fontSize: 15,
-                    //                     ),
-                    //                   ),
-                    //                 ],
-                    //               ),
-                    //               const SizedBox(
-                    //                 height: 15,
-                    //               ),
-                    //               Text(
-                    //                 mySnap[index]["desc"],
-                    //                 style: TextStyle(
-                    //                   color: Colors.black,
-                    //                   fontFamily: ubuntuFont,
-                    //                   fontSize: 15,
-                    //                   height: 1.2,
-                    //                   overflow: TextOverflow.ellipsis,
-                    //                 ),
-                    //                 maxLines: 5,
-                    //               ),
-                    //             ],
-                    //           ),
-                    //           Row(
-                    //             mainAxisAlignment: MainAxisAlignment.start,
-                    //             children: [
-                    //               IconButton(
-                    //                 onPressed: () {
-                    //                   mySnap[index].reference.update({
-                    //                     "date": "2022-07-30",
-                    //                     "category": "Personal",
-                    //                     "title": "Naruto",
-                    //                     "desc": "Boruto",
-                    //                     "blogList": [],
-                    //                   });
-                    //                   setState(() {});
-                    //                 },
-                    //                 icon: const Icon(
-                    //                   Icons.edit,
-                    //                 ),
-                    //               ),
-                    //               IconButton(
-                    //                 onPressed: () {},
-                    //                 icon: const Icon(
-                    //                   Icons.delete,
-                    //                 ),
-                    //               ),
-                    //             ],
-                    //           ),
-                    //         ],
-                    //       ),
-                    //     );
-                    //     // return Padding(
-                    //     //   padding: const EdgeInsets.only(top: 23),
-                    //     //   child: Row(
-                    //     //     mainAxisAlignment: MainAxisAlignment.start,
-                    //     //     children: [
-                    //     //       SizedBox(
-                    //     //         width: MediaQuery.of(context).size.width * 0.2,
-                    //     //       ),
-                    //     //       Column(
-                    //     //         crossAxisAlignment: CrossAxisAlignment.start,
-                    //     //         children: [
-                    //     //           GestureDetector(
-                    //     //             onTap: () {
-                    //     //               print(index);
-                    //     //               setState(() {});
-                    //     //             },
-                    //     //             child: Text(
-                    //     //               mySnap[index]["title"],
-                    //     //               style: TextStyle(
-                    //     //                 color: Colors.black,
-                    //     //                 fontWeight: FontWeight.bold,
-                    //     //                 fontFamily: ubuntuFont,
-                    //     //                 fontSize: 35,
-                    //     //               ),
-                    //     //             ),
-                    //     //           ),
-                    //     //           const SizedBox(
-                    //     //             height: 5,
-                    //     //           ),
-                    //     //           Row(
-                    //     //             mainAxisAlignment: MainAxisAlignment.start,
-                    //     //             children: [
-                    //     //               const Icon(
-                    //     //                 Icons.calendar_month_outlined,
-                    //     //                 size: 15,
-                    //     //                 color: Colors.black,
-                    //     //               ),
-                    //     //               const SizedBox(
-                    //     //                 width: 5,
-                    //     //               ),
-                    //     //               Text(
-                    //     //                 DateFormat("dd-MM-yyyy").format(
-                    //     //                     DateTime.parse(mySnap[index]["date"])),
-                    //     //                 style: TextStyle(
-                    //     //                   color: Colors.black,
-                    //     //                   fontFamily: ubuntuFont,
-                    //     //                   fontSize: 15,
-                    //     //                 ),
-                    //     //               ),
-                    //     //             ],
-                    //     //           ),
-                    //     //           const SizedBox(
-                    //     //             height: 15,
-                    //     //           ),
-                    //     //           Container(
-                    //     //             width: 800,
-                    //     //             child: Text(
-                    //     //               mySnap[index]["desc"],
-                    //     //               style: TextStyle(
-                    //     //                 color: Colors.black,
-                    //     //                 fontFamily: ubuntuFont,
-                    //     //                 fontSize: 15,
-                    //     //                 height: 1.2,
-                    //     //                 overflow: TextOverflow.ellipsis,
-                    //     //               ),
-                    //     //               maxLines: 5,
-                    //     //             ),
-                    //     //           ),
-                    //     //         ],
-                    //     //       ),
-                    //     //       SizedBox(
-                    //     //         width: MediaQuery.of(context).size.width * 0.2,
-                    //     //       ),
-                    //     //     ],
-                    //     //   ),
-                    //     // );
-                    //   },
-                    // ),
                   ),
                 );
               },

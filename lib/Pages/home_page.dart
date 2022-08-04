@@ -18,63 +18,57 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 23, left: 30, right: 30),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Mr. Hunger",
-                    style: TextStyle(
-                      // color: Color.fromARGB(255, 252, 62, 62),
-                      color: const Color(0xFFD61C4E),
-                      fontFamily: ubuntuFont,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 35,
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      setState(() {});
-                    },
-                    child: Icon(
-                      Icons.search,
-                      color: textColor,
-                      size: 25,
-                    ),
-                  ),
-                ],
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
+        automaticallyImplyLeading: false,
+        title: Padding(
+          padding: const EdgeInsets.only(top: 15, left: 30, right: 30),
+          child: Text(
+            "Mr. Hunger",
+            style: TextStyle(
+              color: const Color(0xFFD61C4E),
+              fontFamily: ubuntuFont,
+              fontWeight: FontWeight.bold,
+              fontSize: 35,
+            ),
+          ),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(top: 15, left: 30, right: 30),
+            child: TextButton(
+              onPressed: () {
+                setState(() {});
+              },
+              child: Icon(
+                Icons.search,
+                color: textColor,
+                size: 25,
               ),
             ),
-            const SizedBox(
-              height: 50,
-            ),
-            StreamBuilder<QuerySnapshot>(
-              stream: _fireStore.collection("blog").snapshots(),
-              builder: (BuildContext context,
-                  AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (snapshot.hasError) {
-                  return const Text('Something went wrong');
-                }
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  // return const Center(
-                  //   child: SpinKitRing(
-                  //     color: Colors.black,
-                  //     size: 30,
-                  //   ),
-                  // );
-                  return SpinKitRing(
-                    color: textColor,
-                    size: 30,
-                    lineWidth: 4,
-                  );
-                }
-                var mySnap = snapshot.data!.docs;
-                return ListView.builder(
+          ),
+        ],
+      ),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: _fireStore.collection("blog").snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasError) {
+            return const Text('Something went wrong');
+          }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: SpinKitFadingCube(
+                color: textColor,
+                size: 30,
+              ),
+            );
+          }
+          var mySnap = snapshot.data!.docs;
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                ListView.builder(
                   shrinkWrap: true,
                   physics: const BouncingScrollPhysics(),
                   itemCount: mySnap.length,
@@ -88,16 +82,11 @@ class _HomePageState extends State<HomePage> {
                           onTap: () {
                             List myList = [];
                             myList.add(mySnap[index].data());
-                            Navigator.push(
+                            Navigator.pushNamed(
                               context,
-                              MaterialPageRoute(
-                                builder: (context) => DetailsPage(
-                                  myList: myList,
-                                ),
-                              ),
+                              "/details",
+                              arguments: DetailsArguments(myList),
                             );
-                            // get id : mySnap[index].reference.id
-                            // update by id mySnap[index].reference.update
                             setState(() {});
                           },
                           child: Card(
@@ -119,8 +108,7 @@ class _HomePageState extends State<HomePage> {
                                   Padding(
                                     padding: const EdgeInsets.only(top: 10),
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
                                         Icon(
                                           Icons.calendar_month_outlined,
@@ -168,9 +156,9 @@ class _HomePageState extends State<HomePage> {
                                         label: Text(
                                           mySnap[index]["category"],
                                           style: TextStyle(
-                                            color: textColor,
+                                            color: Colors.red,
                                             fontFamily: ubuntuFont,
-                                            fontSize: 10,
+                                            fontSize: 15,
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                           maxLines: 1,
@@ -190,14 +178,14 @@ class _HomePageState extends State<HomePage> {
                       ),
                     );
                   },
-                );
-              },
+                ),
+                const SizedBox(
+                  height: 30,
+                ),
+              ],
             ),
-            const SizedBox(
-              height: 30,
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

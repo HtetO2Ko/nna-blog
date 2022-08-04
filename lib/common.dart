@@ -13,6 +13,19 @@ void showToast(BuildContext context, String massage) {
   );
 }
 
+class DetailsArguments {
+  final List lis;
+
+  DetailsArguments(this.lis);
+}
+
+class EditArguments {
+  final String docId;
+  final List lis;
+
+  EditArguments(this.docId, this.lis);
+}
+
 // firebase firestore rules
 // rules_version = '2';
 // service firebase.storage {
