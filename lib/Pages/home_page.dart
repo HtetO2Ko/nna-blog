@@ -22,15 +22,16 @@ class _HomePageState extends State<HomePage> {
         elevation: 0,
         backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
+        centerTitle: false,
         title: Padding(
-          padding: const EdgeInsets.only(top: 15, left: 30, right: 30),
+          padding: const EdgeInsets.only(top: 15, left: 15, right: 15),
           child: Text(
             "Mr. Hunger",
             style: TextStyle(
               color: const Color(0xFFD61C4E),
               fontFamily: ubuntuFont,
               fontWeight: FontWeight.bold,
-              fontSize: 35,
+              fontSize: 30,
             ),
           ),
         ),

@@ -251,6 +251,7 @@ class _ShowContentPageState extends State<ShowContentPage> {
                                                 minWidth: 12,
                                                 onPressed: () {
                                                   mySnap[i].reference.delete();
+                                                  Navigator.pop(context);
                                                   setState(() {});
                                                 },
                                                 child: const Text(

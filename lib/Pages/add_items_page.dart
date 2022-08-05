@@ -149,6 +149,7 @@ class _AddItemsPageState extends State<AddItemsPage> {
           blogList.add({
             "type": "Video",
             "value": "",
+            "link": "",
           });
         } else if (image == "code") {
           blogList.add({
@@ -287,6 +288,7 @@ class _AddItemsPageState extends State<AddItemsPage> {
                               height: 50,
                               child: TextButton(
                                 onPressed: () {
+                                  category = "Category";
                                   _showForm();
                                   setState(() {});
                                 },
@@ -404,6 +406,8 @@ class _AddItemsPageState extends State<AddItemsPage> {
                                               maxLines: 1,
                                               onChanged: (value) {
                                                 if (value != "") {
+                                                  blogList[index]["link"] =
+                                                      value;
                                                   getYoutubeVideoId(
                                                       index, value);
                                                 }
@@ -570,7 +574,8 @@ class _AddItemsPageState extends State<AddItemsPage> {
                                       var getURL = await ref.getDownloadURL();
                                       print(">>>> url $getURL");
                                       blogList[i]["value"] = getURL.toString();
-                                      blogList[i]["file"] = "test";
+                                      blogList[i]["file"] =
+                                          blogList[i]["file"].toString();
                                       print("FINISHED>>>>");
                                       await _fireStore.collection("blog").add({
                                         "date": date,
@@ -591,23 +596,27 @@ class _AddItemsPageState extends State<AddItemsPage> {
                                   }
                                   setState(() {});
                                 }
+                                var pushCheck = false;
                                 for (var i = 0; i < checkImage.length; i++) {
                                   if (checkImage.contains("true")) {
                                     print(">>>>>>>>>> Contains");
                                   } else {
-                                    await _fireStore.collection("blog").add({
-                                      "date": date,
-                                      "category": category,
-                                      "title": _titleController.text,
-                                      "desc": desc,
-                                      "blogList": blogList,
-                                    }).then((value) {
-                                      loading = false;
-                                    });
-                                    Navigator.pushNamed(
-                                        context, "/admin/show-items");
-                                    print("pushed");
+                                    pushCheck = true;
                                   }
+                                }
+                                if (pushCheck == true) {
+                                  await _fireStore.collection("blog").add({
+                                    "date": date,
+                                    "category": category,
+                                    "title": _titleController.text,
+                                    "desc": desc,
+                                    "blogList": blogList,
+                                  }).then((value) {
+                                    loading = false;
+                                  });
+                                  Navigator.pushNamed(
+                                      context, "/admin/show-items");
+                                  print("pushed");
                                 }
                               }
                               setState(() {});

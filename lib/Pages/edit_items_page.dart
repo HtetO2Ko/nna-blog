@@ -28,9 +28,10 @@ class _EditItemsPageState extends State<EditItemsPage> {
   bool isOpen = false;
   List getEditDataList = [];
   String docId = "";
-  List<TextEditingController> _textController = [];
-  late List<TextEditingController> _videoController = [];
-  late List<TextEditingController> _codeController = [];
+  // List<TextEditingController> _textController = [];
+  // List<TextEditingController> _videoController = [];
+  // List<TextEditingController> _codeController = [];
+  List<TextEditingController> _controller = [];
 
   void _showForm() async {
     _categoryController.text = "";
@@ -140,7 +141,7 @@ class _EditItemsPageState extends State<EditItemsPage> {
     return GestureDetector(
       onTap: () {
         if (image == "text") {
-          _textController.add(TextEditingController());
+          _controller.add(TextEditingController());
           blogList.add({
             "type": "Text",
             "value": "",
@@ -152,12 +153,14 @@ class _EditItemsPageState extends State<EditItemsPage> {
             "file": XFile,
           });
         } else if (image == "video") {
+          _controller.add(TextEditingController());
           blogList.add({
             "type": "Video",
             "value": "",
             "link": "",
           });
         } else if (image == "code") {
+          _controller.add(TextEditingController());
           blogList.add({
             "type": "Code",
             "value": "",
@@ -190,6 +193,8 @@ class _EditItemsPageState extends State<EditItemsPage> {
       Navigator.pushNamed(context, "/admin");
     } else {
       getCategoryItems();
+      getEditDataList = ["GG"];
+      // getData();
     }
     setState(() {});
   }
@@ -200,8 +205,7 @@ class _EditItemsPageState extends State<EditItemsPage> {
     super.initState();
   }
 
-  @override
-  Widget build(BuildContext context) {
+  getData() {
     final args = ModalRoute.of(context)!.settings.arguments as EditArguments;
     getEditDataList = args.lis;
     docId = args.docId;
@@ -211,12 +215,42 @@ class _EditItemsPageState extends State<EditItemsPage> {
     blogList = getEditDataList[0]["blogList"];
     for (var i = 0; i < blogList.length; i++) {
       if (blogList[i]["type"] == "Text") {
-        _textController.add(TextEditingController());
-        _textController[i].text = blogList[i]["value"];
+        _controller.add(TextEditingController());
+        _controller[i].text = blogList[i]["value"];
       } else if (blogList[i]["type"] == "Code") {
-        _codeController.add(TextEditingController());
-        _codeController[i].text = blogList[i]["value"];
+        _controller.add(TextEditingController());
+        _controller[i].text = blogList[i]["value"];
+      } else if (blogList[i]["type"] == "Video") {
+        _controller.add(TextEditingController());
+        _controller[i].text = blogList[i]["link"];
       }
+    }
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (getEditDataList.isNotEmpty) {
+      final args = ModalRoute.of(context)!.settings.arguments as EditArguments;
+      getEditDataList = args.lis;
+      docId = args.docId;
+      _titleController.text = getEditDataList[0]["title"];
+      category = getEditDataList[0]["category"];
+      date = getEditDataList[0]["date"];
+      blogList = getEditDataList[0]["blogList"];
+      for (var i = 0; i < blogList.length; i++) {
+        if (blogList[i]["type"] == "Text") {
+          _controller.add(TextEditingController());
+          _controller[i].text = blogList[i]["value"];
+        } else if (blogList[i]["type"] == "Code") {
+          _controller.add(TextEditingController());
+          _controller[i].text = blogList[i]["value"];
+        } else if (blogList[i]["type"] == "Video") {
+          _controller.add(TextEditingController());
+          _controller[i].text = blogList[i]["link"];
+        }
+      }
+      getEditDataList.clear();
     }
     return Scaffold(
       body: WillPopScope(
@@ -225,457 +259,513 @@ class _EditItemsPageState extends State<EditItemsPage> {
           setState(() {});
           return false;
         },
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 250),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 20),
-                    child: Text(
-                      "Items",
-                      style: TextStyle(
-                        fontFamily: ubuntuFont,
-                        color: Colors.black,
-                        fontSize: 23,
-                      ),
-                    ),
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          _date(context);
-                          setState(() {});
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.only(top: 20.0, bottom: 20),
-                          padding: const EdgeInsets.only(
-                              left: 15, right: 15, top: 12, bottom: 12),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.black26,
+        child: items.length == 1
+            ? Container()
+            : SafeArea(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 250),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 20),
+                          child: Text(
+                            "Items",
+                            style: TextStyle(
+                              fontFamily: ubuntuFont,
+                              color: Colors.black,
+                              fontSize: 23,
                             ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                DateFormat('dd-MM-yyyy')
-                                    .format(DateTime.parse(date)),
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontFamily: ubuntuFont,
-                                ),
-                              ),
-                              const Icon(
-                                Icons.calendar_month_outlined,
-                                color: Colors.black,
-                              ),
-                            ],
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        child: Row(
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              width: 815,
-                              child: DropdownButtonFormField(
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
+                            GestureDetector(
+                              onTap: () {
+                                _date(context);
+                                setState(() {});
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.only(
+                                    top: 20.0, bottom: 20),
+                                padding: const EdgeInsets.only(
+                                    left: 15, right: 15, top: 12, bottom: 12),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.black26,
+                                  ),
                                 ),
-                                value: category,
-                                items: items.map((String items) {
-                                  return DropdownMenuItem(
-                                    value: items,
-                                    child: Text(items),
-                                  );
-                                }).toList(),
-                                onChanged: (value) {
-                                  category = value.toString();
-                                  setState(() {});
-                                },
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      DateFormat('dd-MM-yyyy')
+                                          .format(DateTime.parse(date)),
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 15,
+                                        fontFamily: ubuntuFont,
+                                      ),
+                                    ),
+                                    const Icon(
+                                      Icons.calendar_month_outlined,
+                                      color: Colors.black,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 20),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 815,
+                                    child: DropdownButtonFormField(
+                                      decoration: const InputDecoration(
+                                        border: OutlineInputBorder(),
+                                      ),
+                                      value: category,
+                                      items: items.map((String items) {
+                                        return DropdownMenuItem(
+                                          value: items,
+                                          child: Text(items),
+                                        );
+                                      }).toList(),
+                                      onChanged: (value) {
+                                        category = value.toString();
+                                        setState(() {});
+                                      },
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 50,
+                                    height: 50,
+                                    child: TextButton(
+                                      onPressed: () {
+                                        _showForm();
+                                        setState(() {});
+                                      },
+                                      child: const Icon(
+                                        Icons.add,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 20),
+                              child: TextField(
+                                controller: _titleController,
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  hintText: "Title",
+                                ),
+                              ),
+                            ),
+                            ListView.builder(
+                              shrinkWrap: true,
+                              physics: const BouncingScrollPhysics(),
+                              scrollDirection: Axis.vertical,
+                              itemCount: blogList.length,
+                              itemBuilder: (context, index) {
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    blogList[index]["type"] == "Image"
+                                        ? Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 20),
+                                            child: Row(
+                                              children: [
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    _selectImage(index);
+                                                    setState(() {});
+                                                  },
+                                                  child: blogList[index]
+                                                              ["value"] ==
+                                                          ""
+                                                      ? const Text(
+                                                          "Choose Image")
+                                                      : kIsWeb
+                                                          ? Image.network(
+                                                              blogList[index]
+                                                                  ["value"],
+                                                              height: 150,
+                                                            )
+                                                          : Image.file(
+                                                              File(blogList[
+                                                                      index]
+                                                                  ["value"]),
+                                                              height: 150,
+                                                            ),
+                                                ),
+                                                IconButton(
+                                                  onPressed: () {
+                                                    blogList.removeAt(index);
+                                                    setState(() {});
+                                                  },
+                                                  icon: const Icon(
+                                                    Icons.close,
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : Container(),
+                                    blogList[index]["type"] == "Text"
+                                        ? Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 20),
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  width: 815,
+                                                  child: TextField(
+                                                    maxLines: 5,
+                                                    controller:
+                                                        _controller[index],
+                                                    onChanged: (value) {
+                                                      blogList[index]["value"] =
+                                                          value;
+                                                      _controller[index]
+                                                              .selection =
+                                                          TextSelection.fromPosition(
+                                                              TextPosition(
+                                                                  offset: _controller[
+                                                                          index]
+                                                                      .text
+                                                                      .length));
+                                                      setState(() {});
+                                                    },
+                                                    onTap: () {
+                                                      _controller[index]
+                                                              .selection =
+                                                          TextSelection.fromPosition(
+                                                              TextPosition(
+                                                                  offset: _controller[
+                                                                          index]
+                                                                      .text
+                                                                      .length));
+                                                      setState(() {});
+                                                    },
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      border:
+                                                          OutlineInputBorder(),
+                                                    ),
+                                                  ),
+                                                ),
+                                                IconButton(
+                                                  onPressed: () {
+                                                    blogList.removeAt(index);
+                                                    setState(() {});
+                                                  },
+                                                  icon: const Icon(
+                                                    Icons.close,
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : Container(),
+                                    blogList[index]["type"] == "Video"
+                                        ? Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 20),
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  width: 815,
+                                                  child: TextField(
+                                                    controller:
+                                                        _controller[index],
+                                                    maxLines: 1,
+                                                    onChanged: (value) {
+                                                      blogList[index]["link"] =
+                                                          value;
+                                                      if (value != "") {
+                                                        getYoutubeVideoId(
+                                                            index, value);
+                                                      }
+                                                      setState(() {});
+                                                    },
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      border:
+                                                          OutlineInputBorder(),
+                                                    ),
+                                                  ),
+                                                ),
+                                                IconButton(
+                                                  onPressed: () {
+                                                    blogList.removeAt(index);
+                                                    setState(() {});
+                                                  },
+                                                  icon: const Icon(
+                                                    Icons.close,
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : Container(),
+                                    blogList[index]["type"] == "Code"
+                                        ? Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 20),
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  width: 815,
+                                                  child: TextField(
+                                                    maxLines: 5,
+                                                    controller:
+                                                        _controller[index],
+                                                    onChanged: (value) {
+                                                      blogList[index]["value"] =
+                                                          value;
+                                                      setState(() {});
+                                                    },
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      border:
+                                                          OutlineInputBorder(),
+                                                    ),
+                                                  ),
+                                                ),
+                                                IconButton(
+                                                  onPressed: () {
+                                                    blogList.removeAt(index);
+                                                    setState(() {});
+                                                  },
+                                                  icon: const Icon(
+                                                    Icons.close,
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : Container(),
+                                  ],
+                                );
+                              },
+                            ),
+                            Row(
+                              children: [
+                                IconButton(
+                                  onPressed: () {
+                                    if (isOpen == false) {
+                                      isOpen = true;
+                                    } else {
+                                      isOpen = false;
+                                    }
+                                    setState(() {});
+                                  },
+                                  icon: isOpen == true
+                                      ? const Icon(
+                                          Icons.close,
+                                          color: Colors.black,
+                                        )
+                                      : const Icon(
+                                          Icons.add,
+                                          color: Colors.black,
+                                        ),
+                                ),
+                                const SizedBox(
+                                  width: 25,
+                                ),
+                                isOpen == false
+                                    ? Container()
+                                    : Row(
+                                        children: [
+                                          _widget("text"),
+                                          const SizedBox(
+                                            width: 25,
+                                          ),
+                                          _widget("image"),
+                                          const SizedBox(
+                                            width: 25,
+                                          ),
+                                          _widget("video"),
+                                          const SizedBox(
+                                            width: 25,
+                                          ),
+                                          _widget("code"),
+                                        ],
+                                      ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
                             Container(
-                              width: 50,
-                              height: 50,
+                              height: MediaQuery.of(context).size.height * 0.07,
+                              color: Colors.black,
                               child: TextButton(
-                                onPressed: () {
-                                  _showForm();
+                                onPressed: () async {
+                                  if (_titleController.text == "" ||
+                                      category == "Category" ||
+                                      blogList.isEmpty) {
+                                    showToast(
+                                        context, "Add Items can't be blank!");
+                                  } else {
+                                    loading = true;
+                                    var desc = "";
+                                    List checkList = [];
+                                    for (var a = 0; a < blogList.length; a++) {
+                                      if (blogList[a]["value"] == "") {
+                                        checkList.add("true");
+                                      }
+                                    }
+                                    setState(() {});
+                                    if (checkList.contains("true")) {
+                                      showToast(
+                                          context, "No post will be added");
+                                      Navigator.pushNamed(
+                                          context, "/admin/show-items");
+                                    } else {
+                                      print(">>>>>>>>>> doc id $docId");
+                                      List getFirstText = [];
+                                      for (var a = 0;
+                                          a < blogList.length;
+                                          a++) {
+                                        if (blogList[a]["type"] == "Text") {
+                                          getFirstText.add(a);
+                                        }
+                                      }
+                                      if (getFirstText.isNotEmpty) {
+                                        desc =
+                                            blogList[getFirstText[0]]["value"];
+                                      }
+                                      List checkImage = [];
+                                      for (var i = 0;
+                                          i < blogList.length;
+                                          i++) {
+                                        if (blogList[i]["type"] == "Image" &&
+                                            blogList[i]["value"] != "") {
+                                          print("START>>>");
+                                          checkImage.add("true");
+                                          XFile file = blogList[i]["file"];
+                                          Reference ref = FirebaseStorage
+                                              .instance
+                                              .ref()
+                                              .child("nna-blog")
+                                              .child(
+                                                  "${blogList[i]["value"]}.jpg");
+                                          final metadata = SettableMetadata(
+                                            contentType: 'image/jpeg',
+                                            customMetadata: {
+                                              'picked-file-path': file.path
+                                            },
+                                          );
+                                          var uploadTask = ref.putData(
+                                              await file.readAsBytes(),
+                                              metadata);
+                                          print("upload >>>> $uploadTask");
+                                          uploadTask.whenComplete(() async {
+                                            var getURL =
+                                                await ref.getDownloadURL();
+                                            print(">>>> url $getURL");
+                                            blogList[i]["value"] =
+                                                getURL.toString();
+                                            blogList[i]["file"] =
+                                                blogList[i]["file"].toString();
+                                            print("FINISHED>>>>");
+                                            await _fireStore
+                                                .collection("blog")
+                                                .doc(docId)
+                                                .update({
+                                              "date": date,
+                                              "category": category,
+                                              "title": _titleController.text,
+                                              "desc": desc,
+                                              "blogList": blogList,
+                                            }).then((value) {
+                                              loading = false;
+                                            });
+                                            Navigator.pushNamed(
+                                                context, "/admin/show-items");
+                                            print("pushed");
+                                            setState(() {});
+                                          });
+                                        } else {
+                                          checkImage.add("false");
+                                        }
+                                        setState(() {});
+                                      }
+                                      bool pushcheck = false;
+                                      for (var i = 0;
+                                          i < checkImage.length;
+                                          i++) {
+                                        if (checkImage.contains("true")) {
+                                        } else {
+                                          pushcheck = true;
+                                        }
+                                      }
+                                      if (pushcheck == true) {
+                                        await _fireStore
+                                            .collection("blog")
+                                            .doc(docId)
+                                            .update({
+                                          "date": date,
+                                          "category": category,
+                                          "title": _titleController.text,
+                                          "desc": desc,
+                                          "blogList": blogList,
+                                        }).then((value) {
+                                          loading = false;
+                                        });
+                                        Navigator.pushNamed(
+                                            context, "/admin/show-items");
+                                        print("pushed");
+                                      }
+                                    }
+                                    setState(() {});
+                                  }
                                   setState(() {});
                                 },
-                                child: const Icon(
-                                  Icons.add,
-                                  color: Colors.black,
+                                child: Center(
+                                  child: loading == true
+                                      ? const SizedBox(
+                                          width: 23,
+                                          height: 23,
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      : Text(
+                                          "Edit Blog",
+                                          style: TextStyle(
+                                            fontFamily: ubuntuFont,
+                                            color: Colors.white,
+                                          ),
+                                        ),
                                 ),
                               ),
                             ),
                           ],
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        child: TextField(
-                          controller: _titleController,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            hintText: "Title",
-                          ),
+                        const SizedBox(
+                          height: 35,
                         ),
-                      ),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: const BouncingScrollPhysics(),
-                        scrollDirection: Axis.vertical,
-                        itemCount: blogList.length,
-                        itemBuilder: (context, index) {
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              blogList[index]["type"] == "Image"
-                                  ? Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 20),
-                                      child: Row(
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () {
-                                              _selectImage(index);
-                                              setState(() {});
-                                            },
-                                            child:
-                                                blogList[index]["value"] == ""
-                                                    ? const Text("Choose Image")
-                                                    : kIsWeb
-                                                        ? Image.network(
-                                                            blogList[index]
-                                                                ["value"],
-                                                            height: 150,
-                                                          )
-                                                        : Image.file(
-                                                            File(blogList[index]
-                                                                ["value"]),
-                                                            height: 150,
-                                                          ),
-                                          ),
-                                          IconButton(
-                                            onPressed: () {
-                                              blogList.removeAt(index);
-                                              setState(() {});
-                                            },
-                                            icon: const Icon(
-                                              Icons.close,
-                                              color: Colors.red,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    )
-                                  : Container(),
-                              blogList[index]["type"] == "Text"
-                                  ? Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 20),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            width: 815,
-                                            child: TextField(
-                                              maxLines: 5,
-                                              controller:
-                                                  _textController[index],
-                                              onChanged: (value) {
-                                                blogList[index]["value"] =
-                                                    value;
-                                                setState(() {});
-                                              },
-                                              decoration: const InputDecoration(
-                                                border: OutlineInputBorder(),
-                                              ),
-                                            ),
-                                          ),
-                                          IconButton(
-                                            onPressed: () {
-                                              blogList.removeAt(index);
-                                              setState(() {});
-                                            },
-                                            icon: const Icon(
-                                              Icons.close,
-                                              color: Colors.red,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    )
-                                  : Container(),
-                              blogList[index]["type"] == "Video"
-                                  ? Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 20),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            width: 815,
-                                            child: TextField(
-                                              maxLines: 1,
-                                              onChanged: (value) {
-                                                blogList[index]["link"] = value;
-                                                if (value != "") {
-                                                  getYoutubeVideoId(
-                                                      index, value);
-                                                }
-                                                setState(() {});
-                                              },
-                                              decoration: const InputDecoration(
-                                                border: OutlineInputBorder(),
-                                              ),
-                                            ),
-                                          ),
-                                          IconButton(
-                                            onPressed: () {
-                                              blogList.removeAt(index);
-                                              setState(() {});
-                                            },
-                                            icon: const Icon(
-                                              Icons.close,
-                                              color: Colors.red,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    )
-                                  : Container(),
-                              blogList[index]["type"] == "Code"
-                                  ? Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 20),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            width: 815,
-                                            child: TextField(
-                                              maxLines: 5,
-                                              onChanged: (value) {
-                                                blogList[index]["value"] =
-                                                    value;
-                                                setState(() {});
-                                              },
-                                              decoration: const InputDecoration(
-                                                border: OutlineInputBorder(),
-                                              ),
-                                            ),
-                                          ),
-                                          IconButton(
-                                            onPressed: () {
-                                              blogList.removeAt(index);
-                                              setState(() {});
-                                            },
-                                            icon: const Icon(
-                                              Icons.close,
-                                              color: Colors.red,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    )
-                                  : Container(),
-                            ],
-                          );
-                        },
-                      ),
-                      Row(
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              if (isOpen == false) {
-                                isOpen = true;
-                              } else {
-                                isOpen = false;
-                              }
-                              setState(() {});
-                            },
-                            icon: isOpen == true
-                                ? const Icon(
-                                    Icons.close,
-                                    color: Colors.black,
-                                  )
-                                : const Icon(
-                                    Icons.add,
-                                    color: Colors.black,
-                                  ),
-                          ),
-                          const SizedBox(
-                            width: 25,
-                          ),
-                          isOpen == false
-                              ? Container()
-                              : Row(
-                                  children: [
-                                    _widget("text"),
-                                    const SizedBox(
-                                      width: 25,
-                                    ),
-                                    _widget("image"),
-                                    const SizedBox(
-                                      width: 25,
-                                    ),
-                                    _widget("video"),
-                                    const SizedBox(
-                                      width: 25,
-                                    ),
-                                    _widget("code"),
-                                  ],
-                                ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      Container(
-                        height: MediaQuery.of(context).size.height * 0.07,
-                        color: Colors.black,
-                        child: TextButton(
-                          onPressed: () async {
-                            if (_titleController.text == "" ||
-                                category == "Category" ||
-                                blogList.isEmpty) {
-                              showToast(context, "Add Items can't be blank!");
-                            } else {
-                              loading = true;
-                              var desc = "";
-                              List checkList = [];
-                              for (var a = 0; a < blogList.length; a++) {
-                                if (blogList[a]["value"] == "") {
-                                  checkList.add("true");
-                                }
-                              }
-                              print(checkList);
-                              setState(() {});
-                              if (checkList.contains("true")) {
-                                showToast(context, "No post will be added");
-                                Navigator.pushNamed(
-                                    context, "/admin/show-items");
-                              } else {
-                                List getFirstText = [];
-                                for (var a = 0; a < blogList.length; a++) {
-                                  if (blogList[a]["type"] == "Text") {
-                                    getFirstText.add(a);
-                                  }
-                                }
-                                if (getFirstText.isNotEmpty) {
-                                  desc = blogList[getFirstText[0]]["value"];
-                                }
-                                List checkImage = [];
-                                for (var i = 0; i < blogList.length; i++) {
-                                  if (blogList[i]["type"] == "Image" &&
-                                      blogList[i]["value"] != "") {
-                                    print("START>>>");
-                                    checkImage.add("true");
-                                    XFile file = blogList[i]["file"];
-                                    Reference ref = FirebaseStorage.instance
-                                        .ref()
-                                        .child("nna-blog")
-                                        .child("${blogList[i]["value"]}.jpg");
-                                    final metadata = SettableMetadata(
-                                      contentType: 'image/jpeg',
-                                      customMetadata: {
-                                        'picked-file-path': file.path
-                                      },
-                                    );
-                                    var uploadTask = ref.putData(
-                                        await file.readAsBytes(), metadata);
-                                    print("upload >>>> $uploadTask");
-                                    uploadTask.whenComplete(() async {
-                                      var getURL = await ref.getDownloadURL();
-                                      print(">>>> url $getURL");
-                                      blogList[i]["value"] = getURL.toString();
-                                      blogList[i]["file"] = "test";
-                                      print("FINISHED>>>>");
-                                      await _fireStore
-                                          .collection("blog")
-                                          .doc()
-                                          .update({
-                                        "date": date,
-                                        "category": category,
-                                        "title": _titleController.text,
-                                        "desc": desc,
-                                        "blogList": blogList,
-                                      }).then((value) {
-                                        loading = false;
-                                      });
-                                      Navigator.pushNamed(
-                                          context, "/admin/show-items");
-                                      print("pushed");
-                                      setState(() {});
-                                    });
-                                  } else {
-                                    checkImage.add("false");
-                                  }
-                                  setState(() {});
-                                }
-                                for (var i = 0; i < checkImage.length; i++) {
-                                  if (checkImage.contains("true")) {
-                                  } else {
-                                    await _fireStore
-                                        .collection("blog")
-                                        .doc()
-                                        .update({
-                                      "date": date,
-                                      "category": category,
-                                      "title": _titleController.text,
-                                      "desc": desc,
-                                      "blogList": blogList,
-                                    }).then((value) {
-                                      loading = false;
-                                    });
-                                    Navigator.pushNamed(
-                                        context, "/admin/show-items");
-                                    print("pushed");
-                                  }
-                                }
-                              }
-                              setState(() {});
-                            }
-                            setState(() {});
-                          },
-                          child: Center(
-                            child: loading == true
-                                ? const SizedBox(
-                                    width: 23,
-                                    height: 23,
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : Text(
-                                    "Edit Blog",
-                                    style: TextStyle(
-                                      fontFamily: ubuntuFont,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                          ),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                  const SizedBox(
-                    height: 35,
-                  ),
-                ],
+                ),
               ),
-            ),
-          ),
-        ),
       ),
     );
   }
