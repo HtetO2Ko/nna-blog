@@ -3,6 +3,7 @@ import 'package:blog/common.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -260,7 +261,7 @@ class _EditItemsPageState extends State<EditItemsPage> {
           return false;
         },
         child: items.length == 1
-            ? Container()
+            ? const SpinKitFadingCube(color: Colors.black)
             : SafeArea(
                 child: SingleChildScrollView(
                   child: Padding(
@@ -654,36 +655,11 @@ class _EditItemsPageState extends State<EditItemsPage> {
                                       for (var i = 0;
                                           i < blogList.length;
                                           i++) {
-                                        if (blogList[i]["type"] == "Image" &&
-                                            blogList[i]["value"] != "") {
-                                          print("START>>>");
-                                          checkImage.add("true");
-                                          XFile file = blogList[i]["file"];
-                                          Reference ref = FirebaseStorage
-                                              .instance
-                                              .ref()
-                                              .child("nna-blog")
-                                              .child(
-                                                  "${blogList[i]["value"]}.jpg");
-                                          final metadata = SettableMetadata(
-                                            contentType: 'image/jpeg',
-                                            customMetadata: {
-                                              'picked-file-path': file.path
-                                            },
-                                          );
-                                          var uploadTask = ref.putData(
-                                              await file.readAsBytes(),
-                                              metadata);
-                                          print("upload >>>> $uploadTask");
-                                          uploadTask.whenComplete(() async {
-                                            var getURL =
-                                                await ref.getDownloadURL();
-                                            print(">>>> url $getURL");
-                                            blogList[i]["value"] =
-                                                getURL.toString();
-                                            blogList[i]["file"] =
-                                                blogList[i]["file"].toString();
-                                            print("FINISHED>>>>");
+                                        if (blogList[i]["type"] == "Image") {
+                                          if (blogList[i]["value"] ==
+                                              blogList[i]["path"]) {
+                                            print(">>>>>>>>>> ");
+                                            checkImage.add("true");
                                             await _fireStore
                                                 .collection("blog")
                                                 .doc(docId)
@@ -698,9 +674,56 @@ class _EditItemsPageState extends State<EditItemsPage> {
                                             });
                                             Navigator.pushNamed(
                                                 context, "/admin/show-items");
-                                            print("pushed");
                                             setState(() {});
-                                          });
+                                          } else {
+                                            print("START>>>");
+                                            checkImage.add("true");
+                                            print(blogList[i]["file"]);
+                                            XFile file = blogList[i]["file"];
+                                            Reference ref = FirebaseStorage
+                                                .instance
+                                                .ref()
+                                                .child("nna-blog")
+                                                .child(
+                                                    "${blogList[i]["value"]}.jpg");
+                                            final metadata = SettableMetadata(
+                                              contentType: 'image/jpeg',
+                                              customMetadata: {
+                                                'picked-file-path': file.path
+                                              },
+                                            );
+                                            var uploadTask = ref.putData(
+                                                await file.readAsBytes(),
+                                                metadata);
+                                            print("upload >>>> $uploadTask");
+                                            uploadTask.whenComplete(() async {
+                                              var getURL =
+                                                  await ref.getDownloadURL();
+                                              print(">>>> url $getURL");
+                                              blogList[i]["value"] =
+                                                  getURL.toString();
+                                              blogList[i]["path"] =
+                                                  getURL.toString();
+                                              blogList[i]["file"] = "";
+                                              print("FINISHED>>>>");
+                                              await _fireStore
+                                                  .collection("blog")
+                                                  .doc(docId)
+                                                  .update({
+                                                "date": date,
+                                                "category": category,
+                                                "title": _titleController.text,
+                                                "desc": desc,
+                                                "blogList": blogList,
+                                              }).then((value) {
+                                                loading = false;
+                                              });
+                                              Navigator.pushNamed(
+                                                  context, "/admin/show-items");
+                                              print("pushed");
+                                              setState(() {});
+                                            });
+                                          }
                                         } else {
                                           checkImage.add("false");
                                         }

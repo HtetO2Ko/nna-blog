@@ -24,11 +24,12 @@ class _AddItemsPageState extends State<AddItemsPage> {
   var items = ["Category"];
   final ImagePicker _picker = ImagePicker();
   List blogList = [];
+  List item = [];
   bool kIsWeb = identical(0, 0.0);
   bool isOpen = false;
 
-  void _showForm() async {
-    _categoryController.text = "";
+  void _showForm(String name, String docId) async {
+    _categoryController.text = name;
     showDialog(
       context: context,
       barrierDismissible: true,
@@ -53,18 +54,32 @@ class _AddItemsPageState extends State<AddItemsPage> {
             color: Colors.blue,
             minWidth: 12,
             onPressed: () {
-              _fireStore.collection("category").add({
-                "category": _categoryController.text,
-              }).then((val) {
-                getCategoryItems();
-                setState(() {});
-              });
-              Navigator.of(context).pop();
+              if (docId == "") {
+                _fireStore.collection("category").add({
+                  "category": _categoryController.text,
+                }).then((val) {
+                  getCategoryItems();
+                  setState(() {});
+                });
+                Navigator.of(context).pop();
+              } else {
+                _fireStore.collection('category').doc(docId).update({
+                  "category": _categoryController.text,
+                }).then((value) {
+                  getCategoryItems();
+                  setState(() {});
+                });
+                if (docId == "") {
+                  Navigator.of(context).pop();
+                } else {
+                  Navigator.pushNamed(context, "/admin/add-items");
+                }
+              }
               setState(() {});
             },
-            child: const Text(
-              "Add",
-              style: TextStyle(
+            child: Text(
+              docId == "" ? "Add" : "Edit",
+              style: const TextStyle(
                 color: Colors.white,
               ),
             ),
@@ -90,9 +105,19 @@ class _AddItemsPageState extends State<AddItemsPage> {
   getCategoryItems() {
     items.clear();
     items = ["Category"];
+    item = [
+      {
+        "category_name": "Category",
+        "doc_id": "",
+      }
+    ];
     _fireStore.collection('category').get().then((snapshot) {
       for (var docs in snapshot.docs) {
         items.add(docs.get("category"));
+        item.add({
+          "category_name": docs.get("category"),
+          "doc_id": docs.id,
+        });
       }
       setState(() {});
     });
@@ -144,6 +169,7 @@ class _AddItemsPageState extends State<AddItemsPage> {
             "type": "Image",
             "value": "",
             "file": XFile,
+            "path": "",
           });
         } else if (image == "video") {
           blogList.add({
@@ -191,6 +217,9 @@ class _AddItemsPageState extends State<AddItemsPage> {
   @override
   void initState() {
     checkSharePreferenceData();
+    popupMenuItemwidth = 815;
+    print(popupMenuItemwidth);
+    setState(() {});
     super.initState();
   }
 
@@ -260,28 +289,226 @@ class _AddItemsPageState extends State<AddItemsPage> {
                           ),
                         ),
                       ),
+                      // Padding(
+                      //   padding: const EdgeInsets.only(bottom: 20),
+                      //   child: Row(
+                      //     children: [
+                      //       Container(
+                      //         width: 815,
+                      //         child: DropdownButtonFormField(
+                      //           decoration: const InputDecoration(
+                      //             border: OutlineInputBorder(),
+                      //           ),
+                      //           value: category,
+                      //           items: items.map((String items) {
+                      //             return DropdownMenuItem(
+                      //               value: items,
+                      //               child: Text(items),
+                      //             );
+                      //           }).toList(),
+                      //           onChanged: (value) {
+                      //             category = value.toString();
+                      //             setState(() {});
+                      //           },
+                      //         ),
+                      //       ),
+                      //       Container(
+                      //         width: 50,
+                      //         height: 50,
+                      //         child: TextButton(
+                      //           onPressed: () {
+                      //             category = "Category";
+                      //             _showForm();
+                      //             setState(() {});
+                      //           },
+                      //           child: const Icon(
+                      //             Icons.add,
+                      //             color: Colors.black,
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
                       Padding(
                         padding: const EdgeInsets.only(bottom: 20),
                         child: Row(
                           children: [
-                            Container(
-                              width: 815,
-                              child: DropdownButtonFormField(
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
+                            PopupMenuButton(
+                              tooltip: "",
+                              initialValue: category,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.black12,
+                                    width: 1,
+                                  ),
                                 ),
-                                value: category,
-                                items: items.map((String items) {
-                                  return DropdownMenuItem(
-                                    value: items,
-                                    child: Text(items),
-                                  );
-                                }).toList(),
-                                onChanged: (value) {
-                                  category = value.toString();
-                                  setState(() {});
-                                },
+                                width: 815,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.08,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 10, right: 10),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        category,
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                      const Icon(
+                                        Icons.arrow_drop_down_outlined,
+                                        size: 15,
+                                        color: Colors.black,
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
+                              itemBuilder: (BuildContext context) => [
+                                for (var i = 0; i < items.length; i++)
+                                  PopupMenuItem(
+                                    onTap: () {
+                                      category = items[i];
+                                      setState(() {});
+                                    },
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              items[i],
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            items[i] == "Category"
+                                                ? Container()
+                                                : Row(
+                                                    children: [
+                                                      IconButton(
+                                                        splashRadius: 20,
+                                                        onPressed: () {
+                                                          if (items[i] !=
+                                                              "Category") {
+                                                            _showForm(
+                                                                items[i],
+                                                                item[i]
+                                                                    ["doc_id"]);
+                                                          }
+                                                          setState(() {});
+                                                        },
+                                                        icon: const Icon(
+                                                          Icons.edit,
+                                                          color: Colors.red,
+                                                          size: 20,
+                                                        ),
+                                                      ),
+                                                      IconButton(
+                                                        splashRadius: 20,
+                                                        onPressed: () {
+                                                          if (items[i] !=
+                                                              "Category") {
+                                                            showDialog(
+                                                              context: context,
+                                                              barrierDismissible:
+                                                                  false,
+                                                              builder: (_) =>
+                                                                  AlertDialog(
+                                                                title: const Text(
+                                                                    "Are you sure you want to delete this category?"),
+                                                                content: Text(
+                                                                  items[i],
+                                                                ),
+                                                                actions: [
+                                                                  FlatButton(
+                                                                    color: Colors
+                                                                        .blue,
+                                                                    minWidth:
+                                                                        12,
+                                                                    onPressed:
+                                                                        () {
+                                                                      Navigator.pop(
+                                                                          context);
+                                                                      setState(
+                                                                          () {});
+                                                                    },
+                                                                    child:
+                                                                        const Text(
+                                                                      "No",
+                                                                      style:
+                                                                          TextStyle(
+                                                                        color: Colors
+                                                                            .white70,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  FlatButton(
+                                                                    color: Colors
+                                                                        .blue,
+                                                                    minWidth:
+                                                                        12,
+                                                                    onPressed:
+                                                                        () {
+                                                                      _fireStore
+                                                                          .collection(
+                                                                              'category')
+                                                                          .doc(item[i]
+                                                                              [
+                                                                              "doc_id"])
+                                                                          .delete();
+                                                                      showToast(
+                                                                          context,
+                                                                          "Deleted Successfully!");
+                                                                      getCategoryItems();
+                                                                      Navigator.pushNamed(
+                                                                          context,
+                                                                          "/admin/add-items");
+                                                                      setState(
+                                                                          () {});
+                                                                    },
+                                                                    child:
+                                                                        const Text(
+                                                                      "Yes",
+                                                                      style:
+                                                                          TextStyle(
+                                                                        color: Colors
+                                                                            .white,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            );
+                                                          }
+                                                          setState(() {});
+                                                        },
+                                                        icon: const Icon(
+                                                          Icons.delete,
+                                                          size: 20,
+                                                          color: Colors.red,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                          ],
+                                        ),
+                                        const Divider(
+                                          color: Colors.black12,
+                                          thickness: 1,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                              ],
                             ),
                             Container(
                               width: 50,
@@ -289,7 +516,7 @@ class _AddItemsPageState extends State<AddItemsPage> {
                               child: TextButton(
                                 onPressed: () {
                                   category = "Category";
-                                  _showForm();
+                                  _showForm("", "");
                                   setState(() {});
                                 },
                                 child: const Icon(
@@ -308,6 +535,7 @@ class _AddItemsPageState extends State<AddItemsPage> {
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             hintText: "Title",
+                            focusedBorder: OutlineInputBorder(),
                           ),
                         ),
                       ),
@@ -377,6 +605,8 @@ class _AddItemsPageState extends State<AddItemsPage> {
                                               },
                                               decoration: const InputDecoration(
                                                 border: OutlineInputBorder(),
+                                                focusedBorder:
+                                                    OutlineInputBorder(),
                                               ),
                                             ),
                                           ),
@@ -449,6 +679,8 @@ class _AddItemsPageState extends State<AddItemsPage> {
                                               },
                                               decoration: const InputDecoration(
                                                 border: OutlineInputBorder(),
+                                                focusedBorder:
+                                                    OutlineInputBorder(),
                                               ),
                                             ),
                                           ),
@@ -576,6 +808,7 @@ class _AddItemsPageState extends State<AddItemsPage> {
                                       blogList[i]["value"] = getURL.toString();
                                       blogList[i]["file"] =
                                           blogList[i]["file"].toString();
+                                      blogList[i]["path"] = getURL.toString();
                                       print("FINISHED>>>>");
                                       await _fireStore.collection("blog").add({
                                         "date": date,

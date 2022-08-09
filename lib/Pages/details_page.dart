@@ -1,10 +1,11 @@
 import 'package:blog/common.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 class DetailsPage extends StatefulWidget {
-  const DetailsPage({Key? key}) : super(key: key);
+  const DetailsPage({Key? key,}) : super(key: key);
 
   @override
   State<DetailsPage> createState() => _DetailsPageState();
@@ -13,10 +14,21 @@ class DetailsPage extends StatefulWidget {
 class _DetailsPageState extends State<DetailsPage> {
   List itemsList = [];
 
+  getData(docId) async {
+    var snap =
+        await FirebaseFirestore.instance.collection("blog").doc(docId).get();
+    itemsList.add(snap.data());
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    // getData(widget.docId);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as DetailsArguments;
-    itemsList = args.lis;
     return Scaffold(
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,

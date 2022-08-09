@@ -14,9 +14,9 @@ void showToast(BuildContext context, String massage) {
 }
 
 class DetailsArguments {
-  final List lis;
+  final String id;
 
-  DetailsArguments(this.lis);
+  DetailsArguments(this.id);
 }
 
 class EditArguments {
@@ -25,6 +25,9 @@ class EditArguments {
 
   EditArguments(this.docId, this.lis);
 }
+
+double popupMenuItemwidth = 15;
+var popupMenuButtonColor = Colors.white;
 
 // firebase firestore rules
 // rules_version = '2';

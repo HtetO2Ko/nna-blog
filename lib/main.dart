@@ -4,6 +4,7 @@ import 'package:blog/Pages/edit_items_page.dart';
 import 'package:blog/Pages/show_items.dart';
 import 'package:blog/Pages/home_page.dart';
 import 'package:blog/Pages/login_page.dart';
+import 'package:blog/common.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:url_strategy/url_strategy.dart';
@@ -32,6 +33,8 @@ class MyApp extends StatelessWidget {
       title: 'Mr. Hunger',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        splashColor: Colors.white,
+        highlightColor: Colors.white,
         scaffoldBackgroundColor: Colors.white,
       ),
       routes: {
@@ -42,6 +45,7 @@ class MyApp extends StatelessWidget {
         '/admin/add-items': (context) => const AddItemsPage(),
         '/admin/edit-items': (context) => const EditItemsPage(),
       },
+      
       home: const HomePage(),
     );
   }

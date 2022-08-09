@@ -251,6 +251,7 @@ class _ShowContentPageState extends State<ShowContentPage> {
                                                 minWidth: 12,
                                                 onPressed: () {
                                                   mySnap[i].reference.delete();
+                                                  showToast(context, "Deleted Successfully!");
                                                   Navigator.pop(context);
                                                   setState(() {});
                                                 },
